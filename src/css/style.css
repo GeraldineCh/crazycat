@@ -1,0 +1,10 @@
+.espacio {
+	margin-right: 10px;
+	margin-bottom: 10px;
+	background-color: white;
+    color: purple;
+    text-align: center;
+    font-size: 60px;
+    height: 80px;
+    width: 80px;
+}
