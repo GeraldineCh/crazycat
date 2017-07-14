@@ -2,16 +2,13 @@
 
 const Begin = (update) => {
   const header = $("<header></header>");
-  /*const link1 = $("<a href="">Inicio</a>");
- const link2 = $("<a href="">Historial</a>");*/
- const separator = $("<span> | </span>");
- const line = $("<span>Gato Loco</span>");
-  const title = $("<h3>Gato Loco</h3>");
+ const separator = $("<span>Inicio | Historial</span>");
+ const line = $("<span></span>");
+  const title = $("<h3>Bienvenido a Gato Loco</h3>");
   const button = $("<button>Iniciar juego</button>");
 
- /*line.append(link1);
- line.append(link2);*/
  line.append(separator);
+ header.append(line);
  header.append(title);
  header.append(button);
  
