@@ -15,12 +15,6 @@ const Game = (update) => {
  general.append(player1);
  general.append(player2);
  general.append(button);
-
- 
- button.on('click', _ => {
-        state.url = Historial;
-        update();
-    });
  
   return general;
 }

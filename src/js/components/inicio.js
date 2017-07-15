@@ -1,6 +1,6 @@
 'use strict';
 
-const Begin = (update) => {
+const Begin = _ => {
   const header = $("<header></header>");
  const separator = $("<span>Inicio | Historial</span>");
  const line = $("<span></span>");
@@ -13,8 +13,8 @@ const Begin = (update) => {
  header.append(button);
  
  button.on('click', _ => {
-        state.url = Players;
-        update();
+        state.actividad = "registro";
+        render($('.root'));
     });
  
   return header;
