@@ -150,8 +150,8 @@ const play= (player, box) => {
       $('h5').text('El juego ha terminado');
       $('.message span').text(player.nombre);
       var body = {
-          win: state.players[0].nombre,
-          lose: state.players[1].nombre,
+          winner_player: state.players[0].nombre,
+          loser_player: state.players[1].nombre,
           number_of_turns_to_win: state.players[0].movimientos
       };
       postJSON('games', body, (response)=> {
@@ -166,8 +166,8 @@ const play= (player, box) => {
       $('h5').text('El juego ha terminado');
       $('.message span').text(player.nombre);
       var body = {
-          win: state.players[1].nombre,
-          lose: state.players[0].nombre,
+          winner_player: state.players[1].nombre,
+          loser_player: state.players[0].nombre,
           number_of_turns_to_win: state.players[1].movimientos
       };
       postJSON('games', body, (response)=> {
