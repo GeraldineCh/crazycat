@@ -2,19 +2,30 @@
 
 const Game = _ => {
  const general = $('<div></div>'); 
- const activePlayer = $('<h3>Turno de ' + state.players[0].nombre + ' </h3>');
+ const activePlayer = $('<h3>Turno de <span id="current-player"></span> </h3>');
  //const board = $('<div class="tablero"><button type="button" id="casilla1" class="espacio" value="e"/><button type="button" id="casilla2" class="espacio" value="e"/></button><button type="button" id="casilla3" class="espacio" value="e"/></button><br><button type="button" id="casilla4" class="espacio" value="e"/></button><button type="button" id="casilla5" class="espacio" value="e"/></button><button type="button" id="casilla6" class="espacio" value="e"/></button><br><button type="button" id="casilla7" class="espacio" value="e"/></button><button type="button" id="casilla8" class="espacio" value="e"/></button><button type="button" id="casilla9" class="espacio" value="e"/></button><br></div>');
  const player1 = $('<span>Moviemientos de' + state.players[0].nombre + '</span><span id="p1-mov"> 0</span><br>');
  const player2 = $('<span>Moviemientos de' + state.players[1].nombre + '</span><span id="p2-mov"> 0</span><br>');
- 
+ const warning = $('<span class="message">Gano <span id="winner"></span></span>');
  const button = $("<button>Mandar al historial</button>");
 
  
  general.append(activePlayer);
- general.append(board());
+ general.append(Board());
  general.append(player1);
  general.append(player2);
+ general.append(warning);
  general.append(button);
+ 
+ button.on('click', _ => {
+    getJSON('games', (err, json) => {
+      if (err) { return console.log(err.message);}
+      state.historial = json;
+      console.log(state.histoial);
+      render($('.root'));
+    });
+  });
+ 
  
   return general;
 }
@@ -92,3 +103,117 @@ function actualizar() {
   }
 }
 */
+
+const Board = _ => {
+  const board= $('<div class="board"></div>');
+  const casillas= 9;
+
+  for (var i = 0; i < casillas; i++) {
+    const casilla = $('<a class="btn casilla" data-position="' + i +'"></a>');
+    casilla.on('click', (e) => {
+      if (state.active == 1) {
+        play(state.players[0], e.target);
+      }else {
+        play(state.players[1], e.target);
+      }
+    });
+    board.append(casilla);
+  }
+  return board;
+}
+
+const play= (player, box) => {
+  let current_box = $(box);
+  current_box.text(player.juego);
+  let row = Math.floor(current_box.data('position') / 3);
+  let column = current_box.data('position') % 3;
+  state.board[row][column] = player.juego;
+
+  player.movimientos += 1;
+
+  if (player.ingreso == 1) {
+    $('#p1-mov').text(player.movimientos);
+  }else {
+    $('#p2-mov').text(player.movimientos);
+  }
+
+  switch (checkWinner()) {
+    case 0:
+      state.win= "empate";
+      $('h5').empty();
+      $('h5').text('El juego ha terminado');
+      $('.message span').text('Es un empate');
+      break;
+    case 1:
+      state.win= player.ingreso;
+      $('h5').empty();
+      $('h5').text('El juego ha terminado');
+      $('.message span').text(player.nombre);
+      var body = {
+          win: state.players[0].nombre,
+          lose: state.players[1].nombre,
+          number_of_turns_to_win: state.players[0].movimientos
+      };
+      postJSON('games', body, (response)=> {
+        console.log(response);
+        state.actividad = "historial";
+        render($('.root'));
+      });
+      break;
+    case 2:
+      state.win= player.ingreso;
+      $('h5').empty();
+      $('h5').text('El juego ha terminado');
+      $('.message span').text(player.nombre);
+      var body = {
+          win: state.players[1].nombre,
+          lose: state.players[0].nombre,
+          number_of_turns_to_win: state.players[1].movimientos
+      };
+      postJSON('games', body, (response)=> {
+        console.log(response);
+        state.actividad = "historial";
+        render($('.root'));
+      });
+      break;
+    case 3:
+      if (player.ingreso == 1) {
+        state.active= 2;
+        $('#current-player').text(state.players[1].nombre);
+      }else {
+        state.active= 1;
+        $('#current-player').text(state.players[0].nombre);
+      }
+      break;
+    default:
+      console.log("El juego a empezado");
+  }
+}
+
+const checkWinner= _ => {
+    return check(state.players[0].juego) ? 1:
+           check(state.players[1].juego) ? 2:
+           checkFull() ? 0 : 3;
+  }
+const check = (player) => {
+     return (state.board[0][0] == state.board[0][1] && state.board[0][0] == state.board[0][2] && (state.board[0][0] == player)) || //first row
+       		  (state.board[1][0] == state.board[1][1] && state.board[1][0] == state.board[1][2] && (state.board[1][0] == player)) || //second row
+       		  (state.board[2][0] == state.board[2][1] && state.board[2][0] == state.board[1][2] && (state.board[2][0] == player)) || //third row
+       		  (state.board[0][0] == state.board[1][0] && state.board[0][0] == state.board[2][0] && (state.board[0][0] == player)) || //first column
+       		  (state.board[0][1] == state.board[1][1] && state.board[0][1] == state.board[2][1] && (state.board[0][1] == player)) || //second column
+       		  (state.board[0][2] == state.board[1][2] && state.board[0][2] == state.board[2][2] && (state.board[0][2] == player)) || //third column
+       		  (state.board[0][0] == state.board[1][1] && state.board[0][0] == state.board[2][2] && (state.board[0][0] == player)) || //diagonal 1
+       		  (state.board[0][2] == state.board[1][1] && state.board[0][2] == state.board[2][0] && (state.board[0][2] == player));   //diagonal 2
+   }
+const checkFull = _ => {
+       return  ((state.board[0][0] == "x") || (state.board[0][0] == "o")) &&
+     			    ((state.board[1][0] == "x") || (state.board[1][0] == "o")) &&
+     			    ((state.board[2][0] == "x") || (state.board[2][0] == "o")) &&
+     			    ((state.board[0][1] == "x") || (state.board[0][1] == "o")) &&
+     			    ((state.board[1][1] == "x") || (state.board[1][1] == "o")) &&
+     			    ((state.board[2][1] == "x") || (state.board[2][1] == "o")) &&
+     			    ((state.board[0][2] == "x") || (state.board[0][2] == "o")) &&
+     			    ((state.board[1][2] == "x") || (state.board[1][2] == "o")) &&
+     			    ((state.board[2][2] == "x") || (state.board[2][2] == "o"));
+   }
+
