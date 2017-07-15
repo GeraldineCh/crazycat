@@ -1,8 +1,8 @@
 'use strict';
 const state = {
   actividad: null,
-  players: [{ingreso:1, nombre: null, juego: "X", mov:0},
-            {ingreso:2, nombre: null, juego: "O", mov:0}],
+  players: [{ingreso:1, nombre: null, juego: "X", movimientos:0},
+            {ingreso:2, nombre: null, juego: "O", movimientos:0}],
   active: null,
   board : null,
   win: null
